@@ -26,6 +26,7 @@ gcc consigneeVehicles.c -o consigneeVehicles
 
 > [!TIP]
 > You can also run this program online in a Linux-based system using
+
 [![Run on Replit](https://replit.com/badge/github/adriancho91s/consigneeVehicles)](https://replit.com/@adriancho91s/consigneeVehicles?v=1)
 
 ### Compile and Run
