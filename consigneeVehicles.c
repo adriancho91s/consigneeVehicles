@@ -159,6 +159,14 @@ void readUserInputWithSpaces(Vehicle *vehicle) {
     getchar();
 }
 
+void clearScreen() {
+    #ifdef WINDOWS
+        system("cls");
+    #else
+        system("clear");
+    #endif
+}
+
 
 int main() {
     int option;
@@ -198,7 +206,7 @@ int main() {
 
                 Vehicle* vehicle = searchVehicleByNumberPlate(mainFile, numberPlate);
                 if(vehicle != NULL) {
-                    system("clear");
+                    clearScreen();
                     char *brand = (char*) malloc(sizeof(char) * 20);
                     char *model = (char*) malloc(sizeof(char) * 20);
                     char *numberPlate = (char*) malloc(sizeof(char) * 6);
@@ -238,7 +246,7 @@ int main() {
 
                 fseek(mainFile, 0, SEEK_SET);
                 Vehicle* vehicle = searchVehicleByValueRange(mainFile, minValue, maxValue);
-                system("clear");
+                clearScreen();
                 if (vehicle != NULL) {
                     while (vehicle != NULL) {
                         char *brand = (char*) malloc(sizeof(char) * 20);
@@ -265,8 +273,8 @@ int main() {
                 printf("Press enter to continue...");
                 getc(stdin);
                 getc(stdin);
-                system("clear");
-                break;
+                clearScreen()
+;                break;
             }
             case 4: {
                 // Search active vehicles by brand and model
