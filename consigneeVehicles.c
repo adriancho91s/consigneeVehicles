@@ -2,11 +2,14 @@
 #include <stdlib.h>
 #include <string.h>
 
-//Help me to convert this program into a system to manage consignee vehicles, instead of employees
-
 /**
- * @brief Definition of a struct that represents an Vehicle
-*/
+ * @file consigneeVehicles.c
+ * @brief Implementation of a program that manages consignee vehicles.
+ * 
+ * This file contains the definition of a struct that represents a vehicle,
+ * along with its attributes such as number plate, brand, model, year, color,
+ * value, state, and type. The struct is named Vehicle.
+ */
 typedef struct {
     char numberPlate[6];
     char brand[20];
@@ -18,63 +21,139 @@ typedef struct {
     char type; // P for ownend, C for consigned
 } Vehicle;
 
-// There is a main file called vehicles.dat, that contains all the vehicles
-
-// Function to instert a vehicle in the file
-// Return a vehicle by his number plate, if it exists, otherwise return NULL
-// Return a vehicle by a range of values, minValue and maxValue
-// Return a vehicle by his brand and model
-// Return a vehicle by this type, P for owned, C for consigned
-// Return a vehicle by his state, A for active, E for inactive
-// All is in the main file called vehicles.dat
-
-// Function declarations
-// void insertVehicle(FILE* mainFile, Vehicle vehicle);
-Vehicle* searchVehicleByNumberPlate(FILE* mainFile, char numberPlate[7]);
+/**
+ * Searches for a vehicle in the main file by its number plate.
+ *
+ * @param mainFile The main file containing the vehicle records.
+ * @param numberPlate The number plate of the vehicle to search for.
+ * @param returnAll Flag indicating whether to return all matching vehicles or just the first one found.
+ *                  Set to 1 to return all matching vehicles, or 0 to return only the first one found.
+ * @return A pointer to the first matching vehicle found, or NULL if no matching vehicle is found.
+ */
+Vehicle* searchVehicleByNumberPlate(FILE* mainFile, char numberPlate[7], int returnAll);
+/**
+ * Searches for a vehicle within a given value range.
+ *
+ * This function searches for a vehicle in the specified main file
+ * that has a value within the given minimum and maximum values.
+ *
+ * @param mainFile The main file containing the vehicle data.
+ * @param minValue The minimum value for the vehicle.
+ * @param maxValue The maximum value for the vehicle.
+ * @return A pointer to the found vehicle, or NULL if no vehicle is found.
+ */
 Vehicle* searchVehicleByValueRange(FILE* mainFile, double minValue, double maxValue);
+/**
+ * Searches for a vehicle in the main file by brand and model.
+ *
+ * @param mainFile The main file containing the vehicle records.
+ * @param brand The brand of the vehicle to search for.
+ * @param model The model of the vehicle to search for.
+ * @return A pointer to the found vehicle, or NULL if not found.
+ */
 Vehicle* searchVehicleByBrandAndModel(FILE* mainFile, char brand[20], char model[20]);
+
+/**
+ * Searches for a vehicle of a specific type in the given file.
+ *
+ * @param mainFile The file to search in.
+ * @param type The type of vehicle to search for(P own, C consigned).
+ * @return A pointer to the found vehicle, or NULL if not found.
+ */
 Vehicle* searchVehicleByType(FILE* mainFile, char type);
+
+/**
+ * Searches for a vehicle by state in the given file.
+ *
+ * @param mainFile The file to search in.
+ * @param state The state to search for.
+ * @return A pointer to the found vehicle, or NULL if not found.
+ */
 Vehicle* searchVehicleByState(FILE* mainFile, char state);
+
+
+/**
+ * @brief Updates the information of a vehicle in the main file.
+ *
+ * This function updates the value and state of a vehicle with the specified number plate
+ * in the main file.
+ *
+ * @param mainFile The pointer to the main file.
+ * @param numberPlate The number plate of the vehicle to update.
+ * @param value The new value of the vehicle.
+ * @param state The new state of the vehicle.
+ * @return int Returns 0 if the vehicle was successfully updated, otherwise returns -1.
+ */
 int updateVehicle(FILE* mainFile, char numberPlate[7], double value, char state);
+
+
+/**
+ * @brief Removes a vehicle from the main file based on its number plate.
+ * 
+ * @param mainFile The file pointer to the main file.
+ * @param numberPlate The number plate of the vehicle to be removed.
+ * @return int Returns 0 if the vehicle was successfully removed, -1 otherwise.
+ */
 int removeVehicle(FILE* mainFile, char numberPlate[7]);
 
-int insertVehicle(FILE* mainFile, Vehicle *vehicle) {
-    fseek(mainFile, 0, SEEK_END);
-    fwrite(vehicle, sizeof(Vehicle), 1, mainFile);
-    return 1;
-}
+/**
+ * Inserts a vehicle record into the main file.
+ *
+ * This function appends the given vehicle record to the end of the main file.
+ *
+ * @param mainFile The file pointer to the main file.
+ * @param vehicle The vehicle record to be inserted.
+ * @return Returns 1 if the insertion is successful, otherwise returns 0.
+ */
+int insertVehicle(FILE* mainFile, Vehicle *vehicle);
 
-Vehicle* searchVehicleByNumberPlate(FILE* mainFile, char numberPlate[6]) {
+
+/**
+ * Reads user input for a Vehicle object, including spaces.
+ *
+ * @param vehicle The pointer to the Vehicle object to store the user input.
+ */
+void readUserInputWithSpaces(Vehicle *vehicle);
+
+/**
+ * Clears the screen.
+ * Valid for both Windows and Unix systems.
+ */
+void clearScreen();
+
+
+Vehicle* searchVehicleByNumberPlate(FILE* mainFile, char numberPlate[6], int returnAll) {
     Vehicle* vehicle = (Vehicle*) malloc(sizeof(Vehicle));
     fseek(mainFile, 0, SEEK_SET);
     while(fread(vehicle, sizeof(Vehicle), 1, mainFile)) {
-        if(strncmp(vehicle->numberPlate, numberPlate, 6) == 0) {
-            return vehicle->state == 'A' ? vehicle : NULL;
+        if (returnAll) {
+            if(strncmp(vehicle->numberPlate, numberPlate, 6) == 0) {
+                return vehicle;
+            }
+        } else {
+            if(strncmp(vehicle->numberPlate, numberPlate, 6) == 0 && vehicle->state == 'A') {
+                return vehicle;
+            }
         }
     }
     return NULL;
 }
 
 
-
-// While the return be !== NULL, print the vehicle
 Vehicle* searchVehicleByValueRange(FILE* mainFile, double minValue, double maxValue) {
     Vehicle* vehicle = (Vehicle*) malloc(sizeof(Vehicle));
-    while(fread(vehicle, sizeof(Vehicle), 1, mainFile)) {
-        if(vehicle->value >= minValue && vehicle->value <= maxValue) {
+    fread(vehicle, sizeof(Vehicle), 1, mainFile);
+    if(vehicle->value >= minValue && vehicle->value <= maxValue) {
             return vehicle;
-        }
     }
     return NULL;
 }
 
 Vehicle* searchVehicleByBrandAndModel(FILE* mainFile, char brand[20], char model[20]) {
     Vehicle* vehicle = (Vehicle*) malloc(sizeof(Vehicle));
-    fseek(mainFile, 0, SEEK_SET);
-    while(fread(vehicle, sizeof(Vehicle), 1, mainFile)) {
-        if(strncmp(vehicle->brand, brand, 20) == 0 && strncmp(vehicle->model, model, 20) == 0) {
-            return vehicle;
-        }
+    fread(vehicle, sizeof(Vehicle), 1, mainFile);
+    if(vehicle->state == 'A' && strncmp(vehicle->brand, brand, 20) == 0 && strncmp(vehicle->model, model, 20) == 0 ){
+        return vehicle;
     }
     return NULL;
 }
@@ -82,21 +161,18 @@ Vehicle* searchVehicleByBrandAndModel(FILE* mainFile, char brand[20], char model
 Vehicle* searchVehicleByType(FILE* mainFile, char type) {
     Vehicle* vehicle = (Vehicle*) malloc(sizeof(Vehicle));
     fseek(mainFile, 0, SEEK_SET);
-    while(fread(vehicle, sizeof(Vehicle), 1, mainFile)) {
-        if(vehicle->type == type) {
+    fread(vehicle, sizeof(Vehicle), 1, mainFile);
+    if(vehicle->type == type) {
             return vehicle;
-        }
     }
     return NULL;
 }
 
 Vehicle* searchVehicleByState(FILE* mainFile, char state) {
     Vehicle* vehicle = (Vehicle*) malloc(sizeof(Vehicle));
-    fseek(mainFile, 0, SEEK_SET);
-    while(fread(vehicle, sizeof(Vehicle), 1, mainFile)) {
-        if(vehicle->state == state) {
+    fread(vehicle, sizeof(Vehicle), 1, mainFile);
+    if(vehicle->state == state) {
             return vehicle;
-        }
     }
     return NULL;
 }
@@ -130,7 +206,12 @@ int removeVehicle(FILE* mainFile, char numberPlate[6]) {
     return 0;
 }
 
-// Function to read stream with blank spaces and save in a struct
+int insertVehicle(FILE* mainFile, Vehicle *vehicle) {
+    fseek(mainFile, 0, SEEK_END);
+    fwrite(vehicle, sizeof(Vehicle), 1, mainFile);
+    return 1;
+}
+
 
 void readUserInputWithSpaces(Vehicle *vehicle) {
     getc(stdin);
@@ -190,21 +271,25 @@ int main() {
 
         switch(option) {
             case 1: {
+                clearScreen();
                 // Insert a vehicle
                 Vehicle *vehicle = (Vehicle*) malloc(sizeof(Vehicle));
                 readUserInputWithSpaces(vehicle);
                 insertVehicle(mainFile, vehicle);
                 printf("Vehicle inserted successfully.\n");
                 free(vehicle);
+                printf("Press enter to continue...");
+                fgetc(stdin);
+                clearScreen();
                 break;
             }
             case 2: {
                 // Search active vehicles by number plate
+                clearScreen();
                 char numberPlate[7];
                 printf("Enter the number plate: ");
                 scanf("%s", numberPlate);
-
-                Vehicle* vehicle = searchVehicleByNumberPlate(mainFile, numberPlate);
+                Vehicle* vehicle = searchVehicleByNumberPlate(mainFile, numberPlate, 0);
                 if(vehicle != NULL) {
                     clearScreen();
                     char *brand = (char*) malloc(sizeof(char) * 20);
@@ -228,12 +313,13 @@ int main() {
                     free(brand);
                     free(model);
                     free(numberPlate);
-                    printf("Press enter to continue...");
-                    getc(stdin);
-                    getc(stdin);
                 } else {
                     printf("Vehicle not found\n");
                 }
+                printf("Press enter to continue...");
+                fgetc(stdin);
+                fgetc(stdin);
+                clearScreen();
                 break;
             }
             case 3: {
@@ -244,11 +330,71 @@ int main() {
                 printf("Enter the maximum value: ");
                 scanf("%lf", &maxValue);
 
+                fseek(mainFile, 0, SEEK_END);
+                int numberOfVehicles = ftell(mainFile) / sizeof(Vehicle);
+                int notFound = 1;
+
+
                 fseek(mainFile, 0, SEEK_SET);
                 Vehicle* vehicle = searchVehicleByValueRange(mainFile, minValue, maxValue);
                 clearScreen();
-                if (vehicle != NULL) {
-                    while (vehicle != NULL) {
+                for (int i = 0; i < numberOfVehicles; i++) {
+                    printf("%d\n", i);
+                    if (vehicle != NULL) {
+                        notFound = 0;
+                        char *brand = (char*) malloc(sizeof(char) * 20);
+                        char *model = (char*) malloc(sizeof(char) * 20);
+                        char *numberPlate = (char*) malloc(sizeof(char) * 7);
+                        strcpy(brand, vehicle->brand);
+                        strcpy(model, vehicle->model);
+                        strcpy(numberPlate, vehicle->numberPlate);
+                        numberPlate[6] = '\0';
+                        brand[19] = '\0';
+                        model[19] = '\0';
+                        printf("* Vehicle found *\n");
+                        printf("Brand: %s\n", brand);
+                        printf("Model: %s\n", model);
+                        printf("Number Plate: %s\n", numberPlate);
+                        printf("Year: %d\n", vehicle->year);
+                        printf("Color: %s\n", vehicle->color);
+                        printf("Value: %.2lf\n", vehicle->value);
+                        printf("State: %c\n", vehicle->state);
+                        printf("Type: %c\n\n", vehicle->type);
+                        free(brand);
+                        free(model);
+                        free(numberPlate);
+                    }
+                    vehicle = searchVehicleByValueRange(mainFile, minValue, maxValue);
+                }
+                if(notFound) {
+                    printf("No vehicles found\n");
+                }
+
+                printf("Press enter to continue...");
+                getc(stdin);
+                getc(stdin);
+                clearScreen()
+;                break;
+            }
+            case 4: {
+                clearScreen();
+                // Search active vehicles by brand and model
+                char brand[20], model[20];
+                printf("Enter the brand: ");
+                scanf("%s", brand);
+                printf("Enter the model: ");
+                scanf("%s", model);
+
+                fseek(mainFile, 0, SEEK_END);
+                int numberOfVehicles = ftell(mainFile) / sizeof(Vehicle);
+                printf("Number of vehicles: %d\n", numberOfVehicles);
+                fseek(mainFile, 0, SEEK_SET);
+                int notFound = 1;
+                Vehicle* vehicle = searchVehicleByBrandAndModel(mainFile, brand, model);
+                for (int i = 0; i < numberOfVehicles; i++) {
+                    printf("%d\n", i);
+                    if (vehicle != NULL) {
+                        notFound = 0;
                         char *brand = (char*) malloc(sizeof(char) * 20);
                         char *model = (char*) malloc(sizeof(char) * 20);
                         char *numberPlate = (char*) malloc(sizeof(char) * 7);
@@ -265,68 +411,147 @@ int main() {
                         free(brand);
                         free(model);
                         free(numberPlate);
-                        vehicle = searchVehicleByValueRange(mainFile, minValue, maxValue);
                     }
-                } else {
-                    printf("No vehicles found in the specified value range.\n");
+                    vehicle = searchVehicleByBrandAndModel(mainFile, brand, model);
+                }
+                if(notFound) {
+                    printf("No vehicles found\n");
                 }
                 printf("Press enter to continue...");
                 getc(stdin);
                 getc(stdin);
-                clearScreen()
-;                break;
-            }
-            case 4: {
-                // Search active vehicles by brand and model
-                char brand[20], model[20];
-                printf("Enter the brand: ");
-                scanf("%s", brand);
-                printf("Enter the model: ");
-                scanf("%s", model);
-
-                Vehicle* vehicle = searchVehicleByBrandAndModel(mainFile, brand, model);
-                if(vehicle != NULL) {
-                    printf("Vehicle found: %s %s %s\n", vehicle->brand, vehicle->model, vehicle->numberPlate);
-                } else {
-                    printf("Vehicle not found\n");
-                }
+                clearScreen();
                 break;
             }
             case 5: {
                 // Search active vehicles by type
+                clearScreen();
                 char type;
                 printf("Enter the type: ");
                 scanf(" %c", &type);
-
-                Vehicle* vehicle = searchVehicleByType(mainFile, type);
-                if(vehicle != NULL) {
-                    printf("Vehicle found: %s %s %s\n", vehicle->brand, vehicle->model, vehicle->numberPlate);
-                } else {
-                    printf("Vehicle not found\n");
+                if (type != 'P' && type != 'C') {
+                    printf("Invalid type. Please try again.\n");
+                    printf("Press enter to continue...");
+                    getc(stdin);
+                    getc(stdin);
+                    clearScreen();
+                    break;
                 }
+                
+                fseek(mainFile, 0, SEEK_END);
+                int numberOfVehicles = ftell(mainFile) / sizeof(Vehicle);
+                fseek(mainFile, 0, SEEK_SET);
+                int notFound = 1;
+                Vehicle* vehicle = searchVehicleByType(mainFile, type);
+                for (int i = 0; i < numberOfVehicles; i++) {
+                    if (vehicle != NULL) {
+                        notFound = 0;
+                        char *brand = (char*) malloc(sizeof(char) * 20);
+                        char *model = (char*) malloc(sizeof(char) * 20);
+                        char *numberPlate = (char*) malloc(sizeof(char) * 7);
+                        strcpy(brand, vehicle->brand);
+                        strcpy(model, vehicle->model);
+                        strcpy(numberPlate, vehicle->numberPlate);
+                        numberPlate[6] = '\0';
+                        brand[19] = '\0';
+                        model[19] = '\0';
+                        printf("* Vehicle found *\n");
+                        printf("Brand: %s\n", brand);
+                        printf("Model: %s\n", model);
+                        printf("Number Plate: %s\n", numberPlate);
+                        printf("Year: %d\n", vehicle->year);
+                        printf("Color: %s\n", vehicle->color);
+                        printf("Value: %.2lf\n", vehicle->value);
+                        printf("State: %c\n", vehicle->state);
+                        printf("Type: %c\n\n", vehicle->type);
+                        free(brand);
+                        free(model);
+                        free(numberPlate);
+                    }
+                    vehicle = searchVehicleByType(mainFile, type);
+                }
+                if(notFound) {
+                    printf("No vehicles found\n");
+                }
+                printf("Press enter to continue...");
+                getc(stdin);
+                getc(stdin);
+                clearScreen();
                 break;
             }
             case 6: {
                 // Search active vehicles by state
+                clearScreen();
                 char state;
                 printf("Enter the state: ");
                 scanf(" %c", &state);
-
-                Vehicle* vehicle = searchVehicleByState(mainFile, state);
-                if(vehicle != NULL) {
-                    printf("Vehicle found: %s %s %s\n", vehicle->brand, vehicle->model, vehicle->numberPlate);
-                } else {
-                    printf("Vehicle not found\n");
+                if (state != 'A' && state != 'E') {
+                    printf("Invalid state. Please try again.\n");
+                    printf("Press enter to continue...");
+                    getc(stdin);
+                    getc(stdin);
+                    clearScreen();
+                    break;
                 }
+
+                fseek(mainFile, 0, SEEK_END);
+                int numberOfVehicles = ftell(mainFile) / sizeof(Vehicle);
+                fseek(mainFile, 0, SEEK_SET);
+                int notFound = 1;
+                Vehicle* vehicle = searchVehicleByState(mainFile, state);
+                for (int i = 0; i < numberOfVehicles; i++) {
+                    if (vehicle != NULL) {
+                        notFound = 0;
+                        char *brand = (char*) malloc(sizeof(char) * 20);
+                        char *model = (char*) malloc(sizeof(char) * 20);
+                        char *numberPlate = (char*) malloc(sizeof(char) * 7);
+                        strcpy(brand, vehicle->brand);
+                        strcpy(model, vehicle->model);
+                        strcpy(numberPlate, vehicle->numberPlate);
+                        numberPlate[6] = '\0';
+                        brand[19] = '\0';
+                        model[19] = '\0';
+                        printf("* Vehicle found *\n");
+                        printf("Brand: %s\n", brand);
+                        printf("Model: %s\n", model);
+                        printf("Number Plate: %s\n", numberPlate);
+                        printf("Year: %d\n", vehicle->year);
+                        printf("Color: %s\n", vehicle->color);
+                        printf("Value: %.2lf\n", vehicle->value);
+                        printf("State: %c\n", vehicle->state);
+                        printf("Type: %c\n\n", vehicle->type);
+                        free(brand);
+                        free(model);
+                        free(numberPlate);
+                    }
+                    vehicle = searchVehicleByState(mainFile, state);
+                }
+                if(notFound) {
+                    printf("No vehicles found\n");
+                }
+                printf("Press enter to continue...");
+                getc(stdin);
+                getc(stdin);
+                clearScreen();
                 break;
             }
             case 7: {
+                clearScreen();
                 // Update a vehicle (value, state)
                 char numberPlate[7];
                 double value;
                 char state;
                 printf("Enter the number plate: ");
                 scanf("%s", numberPlate);
+                if (searchVehicleByNumberPlate(mainFile, numberPlate, 1) == NULL) {
+                    printf("Vehicle not found\n");
+                    printf("Press enter to continue...");
+                    getc(stdin);
+                    getc(stdin);
+                    clearScreen();
+                    break;
+                }
+                fseek(mainFile, 0, SEEK_SET);
                 printf("Enter the new value: ");
                 scanf("%lf", &value);
                 printf("Enter the new state: ");
@@ -338,44 +563,58 @@ int main() {
                 } else {
                     printf("Vehicle not found\n");
                 }
+                printf("Press enter to continue...");
+                getc(stdin);
+                getc(stdin);
+                clearScreen();
                 break;
             }
             case 8: {
                 // Remove a vehicle logically
+                clearScreen();
                 char numberPlate[7];
                 printf("Enter the number plate: ");
                 scanf("%s", numberPlate);
-
+                
+                Vehicle* vehicle = searchVehicleByNumberPlate(mainFile, numberPlate, 1);
+                if(vehicle == NULL) {
+                    printf("Vehicle not found\n");
+                    printf("Press enter to continue...");
+                    getc(stdin);
+                    getc(stdin);
+                    clearScreen();
+                    break;
+                }
+                fseek(mainFile, 0, SEEK_SET);
                 int result = removeVehicle(mainFile, numberPlate);
                 if(result) {
                     printf("Vehicle removed successfully.\n");
                 } else {
                     printf("Vehicle not found\n");
                 }
+                printf("Press enter to continue...");
+                getc(stdin);
+                getc(stdin);
+                clearScreen();
                 break;
             }
             case 9: {
                 // Exit
                 printf("Exiting...\n");
+                clearScreen();
                 break;
             }
             default:
+                clearScreen();
                 printf("Invalid option. Please try again.\n");
+                printf("Press enter to continue...");
+                getc(stdin);
+                getc(stdin);
+                clearScreen();
+                break;
         }
         fclose(mainFile);
     } while(option != 9);
 
     return 0;
 }
-
-// Main menu with the following options:
-// 1 - Insert a vehicle
-// 2 - Search actives vehicles by number plate
-// 3 - Search actives vehicles by value range
-// 4 - Search actives vehicles by brand and model
-// 5 - Search actives vehicles by type
-// 6 - Search actives vehicles by state
-// 7 - Update a vehicle (value, state)
-// 8 - Remove a vehicle logically
-// 9 - Exit
-
