@@ -17,9 +17,22 @@ This is a simple C program to manage consignee vehicles. It provides functionali
 
 Compile the `consigneeVehicles.c` file and run the resulting executable. The program will present a menu with the above options.
 
+```bash
+gcc consigneeVehicles.c -o consigneeVehicles
+./consigneeVehicles
+```
+
 ### Run Online
 
-You can also run this program online in a Linux-based system using [Replit](https://replit.com/@adriancho91s/consigneeVehicles?v=1).
+[!TIP]
+You can also run this program online in a Linux-based system using     
+[![Run on Replit](https://replit.com/badge/github/adriancho91s/consigneeVehicles)](https://replit.com/@adriancho91s/consigneeVehicles?v=1)
+    
+
+
+### Compile and Run
+
+
 
 ## Contributing
 
