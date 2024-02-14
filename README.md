@@ -13,15 +13,6 @@ This is a simple C program to manage consignee vehicles. It provides functionali
 7. Update a vehicle (value, state)
 8. Remove a vehicle logically
 
-## Usage
-
-Compile the `consigneeVehicles.c` file and run the resulting executable. The program will present a menu with the above options.
-
-```bash
-gcc consigneeVehicles.c -o consigneeVehicles
-./consigneeVehicles
-```
-
 ### Run Online
 
 > [!TIP]
@@ -29,7 +20,16 @@ gcc consigneeVehicles.c -o consigneeVehicles
 
 [![Run on Replit](https://replit.com/badge/github/adriancho91s/consigneeVehicles)](https://replit.com/@adriancho91s/consigneeVehicles?v=1)
 
+## Usage
+
+Compile the `consigneeVehicles.c` file and run the resulting executable. The program will present a menu with the above options.
+
 ### Compile and Run
+
+```bash
+gcc consigneeVehicles.c -o consigneeVehicles
+./consigneeVehicles
+```
 
 ## Contributing
 
