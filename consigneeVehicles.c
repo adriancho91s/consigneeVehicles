@@ -113,7 +113,7 @@ int insertVehicle(FILE* mainFile, Vehicle *vehicle);
  *
  * @param vehicle The pointer to the Vehicle object to store the user input.
  */
-void readUserInputWithSpaces(Vehicle *vehicle);
+void readUserInputWithSpaces(Vehicle *vehicle, FILE* mainFile);
 
 /**
  * Clears the screen.
@@ -245,10 +245,27 @@ int insertVehicle(FILE* mainFile, Vehicle *vehicle) {
 }
 
 
-void readUserInputWithSpaces(Vehicle *vehicle) {
+void readUserInputWithSpaces(Vehicle *vehicle, FILE* mainFile) {
     getc(stdin);
     printf("Enter the number plate: ");
     fgets(vehicle->numberPlate, 7, stdin);
+    //Validate if the vehicle is already in the system
+    Vehicle* foundVehicle = searchVehicleByNumberPlate(mainFile, vehicle->numberPlate, 1);
+    if(foundVehicle != NULL){
+        printf("Vehicle already in the system\n");
+        if (foundVehicle->state == 'A') {
+            printf("Vehicle is active\n");
+        } else {
+          printf("Do you want to active the vehicle? (y/n): ");
+          char choice;
+          scanf("%c", &choice);
+          if (choice == 'y') {
+            updateVehicle(mainFile, foundVehicle->numberPlate, foundVehicle->value, foundVehicle->state);
+          } else {
+            return;
+          }
+        }
+    }
     getc(stdin);
     printf("Enter the brand: ");
     fgets(vehicle->brand, sizeof(vehicle->brand), stdin);
@@ -307,7 +324,7 @@ int main() {
                 clearScreen();
                 // Insert a vehicle
                 Vehicle *vehicle = (Vehicle*) malloc(sizeof(Vehicle));
-                readUserInputWithSpaces(vehicle);
+                readUserInputWithSpaces(vehicle, mainFile);
                 insertVehicle(mainFile, vehicle);
                 printf("Vehicle inserted successfully.\n");
                 free(vehicle);
