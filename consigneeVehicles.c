@@ -112,6 +112,8 @@ int insertVehicle(FILE* mainFile, Vehicle *vehicle);
  * Reads user input for a Vehicle object, including spaces.
  *
  * @param vehicle The pointer to the Vehicle object to store the user input.
+ * @param mainFile The file pointer to the main file.
+ * @return int Returns 0 if the vehicle is not in the system, 1 otherwise.
  */
 int readUserInputWithSpaces(Vehicle *vehicle, FILE* mainFile);
 
@@ -120,6 +122,13 @@ int readUserInputWithSpaces(Vehicle *vehicle, FILE* mainFile);
  * Valid for both Windows and Unix systems.
  */
 void clearScreen();
+
+/**
+ * Gets the total number of consigned and owned vehicles, and their total value.
+ *
+ * @param mainFile The file pointer to the main file.
+ */
+void getTotal(FILE* mainFile);
 
 
 Vehicle* searchVehicleByNumberPlate(FILE* mainFile, char numberPlate[6], int returnAll) {
@@ -158,7 +167,6 @@ Vehicle* searchVehicleByBrandAndModel(FILE* mainFile, char brand[20], char model
     return NULL;
 }
 
-//Get total of consignee vehicles and own vehicles and his total value
 void getTotal(FILE* mainFile) {
     Vehicle* vehicle = (Vehicle*) malloc(sizeof(Vehicle));
     fseek(mainFile, 0, SEEK_END);
@@ -244,7 +252,6 @@ int insertVehicle(FILE* mainFile, Vehicle *vehicle) {
     return 1;
 }
 
-//If return 1 the vehicle is already in the system and if return 0 the vehicle is not in the system
 int readUserInputWithSpaces(Vehicle *vehicle, FILE* mainFile) {
     getc(stdin);
     printf("Enter the number plate: ");
@@ -329,7 +336,6 @@ int main() {
                 Vehicle *vehicle = (Vehicle*) malloc(sizeof(Vehicle));
                 int isInSystem = readUserInputWithSpaces(vehicle, mainFile);
                 if (isInSystem) {
-
                     printf("Press enter to continue...");
                     getc(stdin);
                     getc(stdin);
