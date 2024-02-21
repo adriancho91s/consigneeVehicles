@@ -244,8 +244,8 @@ int insertVehicle(FILE* mainFile, Vehicle *vehicle) {
     return 1;
 }
 
-
-void readUserInputWithSpaces(Vehicle *vehicle, FILE* mainFile) {
+//If return 1 the vehicle is already in the system and if return 0 the vehicle is not in the system
+int readUserInputWithSpaces(Vehicle *vehicle, FILE* mainFile) {
     getc(stdin);
     printf("Enter the number plate: ");
     fgets(vehicle->numberPlate, 7, stdin);
@@ -255,14 +255,17 @@ void readUserInputWithSpaces(Vehicle *vehicle, FILE* mainFile) {
         printf("Vehicle already in the system\n");
         if (foundVehicle->state == 'A') {
             printf("Vehicle is active\n");
+            return 1;
         } else {
           printf("Do you want to active the vehicle? (y/n): ");
           char choice;
+          getc(stdin);
+            getc(stdin);
           scanf("%c", &choice);
           if (choice == 'y') {
             updateVehicle(mainFile, foundVehicle->numberPlate, foundVehicle->value, foundVehicle->state);
           } else {
-            return;
+            return 1;
           }
         }
     }
@@ -287,6 +290,7 @@ void readUserInputWithSpaces(Vehicle *vehicle, FILE* mainFile) {
     printf("Enter the type: ");
     scanf(" %c", &(vehicle->type));
     getchar();
+    return 0;
 }
 
 void clearScreen() {
@@ -324,7 +328,13 @@ int main() {
                 clearScreen();
                 // Insert a vehicle
                 Vehicle *vehicle = (Vehicle*) malloc(sizeof(Vehicle));
-                readUserInputWithSpaces(vehicle, mainFile);
+                int isInSystem = readUserInputWithSpaces(vehicle, mainFile);
+                if (isInSystem) {
+                    printf("Press enter to continue...");
+                    fgetc(stdin);
+                    clearScreen();
+                    break;
+                }
                 insertVehicle(mainFile, vehicle);
                 printf("Vehicle inserted successfully.\n");
                 free(vehicle);
@@ -662,7 +672,7 @@ int main() {
             case 10: {
                 clearScreen();
                 printf("Exiting...\n");
-                break;
+                return 0;
             }
             default:
                 clearScreen();
