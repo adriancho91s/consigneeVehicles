@@ -260,7 +260,6 @@ int readUserInputWithSpaces(Vehicle *vehicle, FILE* mainFile) {
           printf("Do you want to get active the vehicle? (y/n): ");
           char choice;
           getc(stdin);
-            getc(stdin);
           scanf("%c", &choice);
           if (choice == 'y') {
             updateVehicle(mainFile, foundVehicle->numberPlate, foundVehicle->value, 'A');
@@ -330,8 +329,10 @@ int main() {
                 Vehicle *vehicle = (Vehicle*) malloc(sizeof(Vehicle));
                 int isInSystem = readUserInputWithSpaces(vehicle, mainFile);
                 if (isInSystem) {
+
                     printf("Press enter to continue...");
-                    fgetc(stdin);
+                    getc(stdin);
+                    getc(stdin);
                     clearScreen();
                     break;
                 }
