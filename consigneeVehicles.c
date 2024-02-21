@@ -113,7 +113,7 @@ int insertVehicle(FILE* mainFile, Vehicle *vehicle);
  *
  * @param vehicle The pointer to the Vehicle object to store the user input.
  */
-void readUserInputWithSpaces(Vehicle *vehicle, FILE* mainFile);
+int readUserInputWithSpaces(Vehicle *vehicle, FILE* mainFile);
 
 /**
  * Clears the screen.
@@ -257,16 +257,16 @@ int readUserInputWithSpaces(Vehicle *vehicle, FILE* mainFile) {
             printf("Vehicle is active\n");
             return 1;
         } else {
-          printf("Do you want to active the vehicle? (y/n): ");
+          printf("Do you want to get active the vehicle? (y/n): ");
           char choice;
           getc(stdin);
             getc(stdin);
           scanf("%c", &choice);
           if (choice == 'y') {
-            updateVehicle(mainFile, foundVehicle->numberPlate, foundVehicle->value, foundVehicle->state);
-          } else {
+            updateVehicle(mainFile, foundVehicle->numberPlate, foundVehicle->value, 'A');
             return 1;
           }
+           return 1;
         }
     }
     getc(stdin);
