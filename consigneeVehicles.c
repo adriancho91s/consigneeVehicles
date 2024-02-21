@@ -158,6 +158,38 @@ Vehicle* searchVehicleByBrandAndModel(FILE* mainFile, char brand[20], char model
     return NULL;
 }
 
+//Get total of consignee vehicles and own vehicles and his total value
+void getTotal(FILE* mainFile) {
+    Vehicle* vehicle = (Vehicle*) malloc(sizeof(Vehicle));
+    fseek(mainFile, 0, SEEK_END);
+    int numberOfVehicles = ftell(mainFile) / sizeof(Vehicle);
+    int consigned = 0;
+    int owned = 0;
+
+    double consignedValue = 0;
+    double ownedValue = 0;
+    fseek(mainFile, 0, SEEK_SET);
+    for (int i = 0; i < numberOfVehicles; i++) {
+        fread(vehicle, sizeof(Vehicle), 1, mainFile);
+        if(vehicle->state == 'A') {
+            if(vehicle->type == 'C') {
+                consigned++;
+                consignedValue += vehicle->value;
+            } else {
+                owned++;
+                ownedValue += vehicle->value;
+            }
+        }
+    }
+    printf("Consigned vehicles: %d\n", consigned);
+    printf("Owned vehicles: %d\n", owned);
+    printf("Consigned vehicles total value: %.2lf\n", consignedValue);
+    printf("Owned vehicles total value: %.2lf\n", ownedValue);
+    free(vehicle);
+
+
+}
+
 Vehicle* searchVehicleByType(FILE* mainFile, char type) {
     Vehicle* vehicle = (Vehicle*) malloc(sizeof(Vehicle));
     fseek(mainFile, 0, SEEK_SET);
@@ -265,7 +297,8 @@ int main() {
         printf("6 - Search active vehicles by state\n");
         printf("7 - Update a vehicle (value, state)\n");
         printf("8 - Remove a vehicle logically\n");
-        printf("9 - Exit\n");
+        printf("9 - Get total\n");
+        printf("10 - Exit\n");
         printf("Enter your option: ");
         scanf("%d", &option);
 
@@ -569,6 +602,7 @@ int main() {
                 clearScreen();
                 break;
             }
+
             case 8: {
                 // Remove a vehicle logically
                 clearScreen();
@@ -598,10 +632,19 @@ int main() {
                 clearScreen();
                 break;
             }
+            //add get total to the main menu
             case 9: {
-                // Exit
-                printf("Exiting...\n");
                 clearScreen();
+                getTotal(mainFile);
+                printf("Press enter to continue...");
+                getc(stdin);
+                getc(stdin);
+                clearScreen();
+                break;
+            }
+            case 10: {
+                clearScreen();
+                printf("Exiting...\n");
                 break;
             }
             default:
@@ -613,6 +656,7 @@ int main() {
                 clearScreen();
                 break;
         }
+
         fclose(mainFile);
     } while(option != 9);
 
